@@ -1,14 +1,20 @@
 from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Address
 from .permissions import IsOwner
 from .serializers import AddressSerializer, UserRegistrationSerializer
+from .throttles import LoginRateThrottle
 
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = (AllowAny,)
+
+
+class LoginView(TokenObtainPairView):
+    throttle_classes = (LoginRateThrottle,)
 
 
 class AddressViewSet(viewsets.ModelViewSet):
