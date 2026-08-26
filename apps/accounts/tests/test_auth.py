@@ -1,4 +1,5 @@
 import pytest
+from django.core.cache import cache
 from rest_framework.test import APIClient
 
 from apps.accounts.models import User
@@ -38,3 +39,14 @@ def test_blacklisted_refresh_token_cannot_be_reused(api_client, user):
 
     resp = api_client.post('/api/auth/token/refresh/', {'refresh': tokens['refresh']})
     assert resp.status_code == 401
+
+
+@pytest.mark.django_db
+def test_login_throttled_after_repeated_attempts(api_client, user):
+    cache.clear()  # aislar del consumo de otros tests sobre el mismo scope 'login'
+
+    for _ in range(5):
+        api_client.post('/api/auth/token/', {'email': 'lena@example.com', 'password': 'wrong'})
+
+    resp = api_client.post('/api/auth/token/', {'email': 'lena@example.com', 'password': 'wrong'})
+    assert resp.status_code == 429
