@@ -14,4 +14,4 @@ DATABASES = {
 # En local, cualquier origen puede pegarle a la API (solo mientras DEBUG=True).
 CORS_ALLOW_ALL_ORIGINS = True
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+MAILERS = {'default': {'BACKEND': 'django.core.mail.backends.console.EmailBackend'}}

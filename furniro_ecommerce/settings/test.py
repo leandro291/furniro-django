@@ -15,4 +15,4 @@ DATABASES = {
 # Hashes rápidos: los tests no necesitan seguridad real de passwords.
 PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
 
-EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+MAILERS = {'default': {'BACKEND': 'django.core.mail.backends.locmem.EmailBackend'}}
