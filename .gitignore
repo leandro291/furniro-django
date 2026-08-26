@@ -3,3 +3,4 @@ venv
 skills-lock.json
 __pycache__
 .claude
+CLAUDE.md
