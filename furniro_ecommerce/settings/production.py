@@ -1,12 +1,12 @@
 from .base import *  # noqa: F401,F403
-from .base import env
+from .base import env_db, env_list
 
 DEBUG = False
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')  # sin default: falla explícito si falta
+ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS')  # sin default: falla explícito si falta
 
 DATABASES = {
-    'default': env.db('DATABASE_URL'),  # sin default: falla explícito si falta
+    'default': env_db('DATABASE_URL'),  # sin default: falla explícito si falta
 }
 
 # CORS_ALLOWED_ORIGINS ya viene de base.py (env var), nunca ALLOW_ALL acá.

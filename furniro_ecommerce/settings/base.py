@@ -3,17 +3,55 @@ Settings comunes a todos los entornos. No se usa directamente:
 importar desde development.py, production.py o test.py.
 """
 
+import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlparse
 
-import environ
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-env = environ.Env()
-environ.Env.read_env(BASE_DIR / '.env')
+load_dotenv(BASE_DIR / '.env')
 
-SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='django-insecure-override-in-env')
+
+def env_str(key, default=None):
+    value = os.getenv(key, default)
+    if value is None:
+        raise ImproperlyConfigured(f'Falta la variable de entorno {key}')
+    return value
+
+
+def env_int(key, default):
+    return int(os.getenv(key, default))
+
+
+def env_list(key, default=None):
+    value = os.getenv(key)
+    if value is None:
+        if default is None:
+            raise ImproperlyConfigured(f'Falta la variable de entorno {key}')
+        return default
+    return [item.strip() for item in value.split(',') if item.strip()]
+
+
+def env_db(key):
+    value = os.getenv(key)
+    if not value:
+        raise ImproperlyConfigured(f'Falta la variable de entorno {key}')
+    parsed = urlparse(value)
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': parsed.path.lstrip('/'),
+        'USER': parsed.username,
+        'PASSWORD': parsed.password,
+        'HOST': parsed.hostname,
+        'PORT': parsed.port,
+    }
+
+
+SECRET_KEY = env_str('DJANGO_SECRET_KEY', default='django-insecure-override-in-env')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -116,8 +154,8 @@ REST_FRAMEWORK = {
 
 # ---- JWT ----
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=env.int('JWT_ACCESS_TOKEN_LIFETIME_MINUTES', default=30)),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=env.int('JWT_REFRESH_TOKEN_LIFETIME_DAYS', default=7)),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=env_int('JWT_ACCESS_TOKEN_LIFETIME_MINUTES', 30)),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=env_int('JWT_REFRESH_TOKEN_LIFETIME_DAYS', 7)),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
@@ -133,9 +171,9 @@ SPECTACULAR_SETTINGS = {
 
 # ---- Cloudinary ----
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': env.str('CLOUDINARY_CLOUD_NAME', default=''),
-    'API_KEY': env.str('CLOUDINARY_API_KEY', default=''),
-    'API_SECRET': env.str('CLOUDINARY_API_SECRET', default=''),
+    'CLOUD_NAME': env_str('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': env_str('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': env_str('CLOUDINARY_API_SECRET', default=''),
 }
 
 # Todas las imágenes (Product.image, Post.image) se suben a Cloudinary.
@@ -146,4 +184,4 @@ STORAGES = {
 }
 
 # ---- CORS ----
-CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
+CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', default=[])
