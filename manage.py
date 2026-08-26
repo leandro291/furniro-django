@@ -2,10 +2,14 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 def main():
     """Run administrative tasks."""
+    load_dotenv(Path(__file__).resolve().parent / '.env')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'furniro_ecommerce.settings.development')
     try:
         from django.core.management import execute_from_command_line
