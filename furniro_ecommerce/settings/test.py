@@ -1,9 +1,18 @@
+import tempfile
+
 from .base import *  # noqa: F401,F403
 from .base import BASE_DIR
 
 DEBUG = False
 SECRET_KEY = 'django-insecure-test-key-not-for-real-use-32bytes'
 ALLOWED_HOSTS = ['*']
+
+# Nunca pegarle a Cloudinary real desde un test: filesystem local en un dir temporal.
+MEDIA_ROOT = tempfile.mkdtemp(prefix='furniro-test-media-')
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+}
 
 DATABASES = {
     'default': {

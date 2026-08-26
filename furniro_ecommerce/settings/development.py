@@ -11,6 +11,8 @@ DATABASES = {
     }
 }
 
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # En local, cualquier origen puede pegarle a la API (solo mientras DEBUG=True).
 CORS_ALLOW_ALL_ORIGINS = True
 
