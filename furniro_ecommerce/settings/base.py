@@ -30,7 +30,11 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'cloudinary_storage',
     'cloudinary',
+    # Apps propias
+    'apps.accounts',
 ]
+
+AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
