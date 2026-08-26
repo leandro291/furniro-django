@@ -113,7 +113,10 @@ DJANGO_SETTINGS_MODULE=furniro_ecommerce.settings.production python manage.py ch
 
 Pensado para PaaS tipo Railway/Render (detectan `requirements.txt` + `Procfile` solos, sin necesidad de Docker/CI):
 
-- **`Procfile`**: fase `release` corre `migrate` + `collectstatic`; fase `web` levanta `gunicorn`.
+- **Railway**: usa `Procfile` tal cual — fase `release` corre `migrate` + `collectstatic`; fase `web` levanta `gunicorn`.
+- **Render**: no tiene fase `release`, así que hay que configurar a mano:
+  - **Build Command**: `./build.sh` (instala dependencias, corre `collectstatic` y `migrate`).
+  - **Start Command**: `gunicorn furniro_ecommerce.wsgi:application --bind 0.0.0.0:$PORT` (la línea `web` del `Procfile`).
 - **Static files**: servidos por WhiteNoise (no hay CDN delante en estas plataformas); media sigue yendo a Cloudinary.
 - **Variables de entorno**: se cargan en el dashboard de la plataforma, no en ningún archivo — ver la tabla de arriba. En particular, `DJANGO_SETTINGS_MODULE=furniro_ecommerce.settings.production` tiene que estar seteada ahí para que la app arranque con la configuración correcta.
 - **Base de datos**: se linkea el addon de Postgres de la plataforma, que inyecta `DATABASE_URL` automáticamente.
