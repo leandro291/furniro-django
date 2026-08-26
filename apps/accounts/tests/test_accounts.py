@@ -49,3 +49,20 @@ def test_user_cannot_see_another_users_address(api_client):
 
     resp = api_client.get(f'/api/accounts/addresses/{address.id}/')
     assert resp.status_code == 404
+
+
+@pytest.mark.django_db
+def test_owner_can_create_and_retrieve_own_address(api_client):
+    owner = User.objects.create_user(username='owner', email='owner@example.com', password='x')
+    api_client.force_authenticate(user=owner)
+
+    resp = api_client.post('/api/accounts/addresses/', {
+        'first_name': 'A', 'last_name': 'B', 'street': 'Main 1',
+        'city': 'CABA', 'province': 'BA', 'phone': '123', 'email': 'owner@example.com',
+    })
+    assert resp.status_code == 201
+    address_id = resp.data['id']
+
+    resp = api_client.get(f'/api/accounts/addresses/{address_id}/')
+    assert resp.status_code == 200
+    assert resp.data['street'] == 'Main 1'
