@@ -16,6 +16,14 @@ def make_test_image():
     return SimpleUploadedFile('test.png', buf.read(), content_type='image/png')
 
 
+def make_oversized_image():
+    # BMP sin compresión: 1500x1500x3 bytes ~6.4MB, supera el límite de 5MB real.
+    buf = io.BytesIO()
+    Image.new('RGB', (1500, 1500), color='red').save(buf, format='BMP')
+    buf.seek(0)
+    return SimpleUploadedFile('big.bmp', buf.read(), content_type='image/bmp')
+
+
 @pytest.fixture
 def api_client():
     return APIClient()
@@ -60,6 +68,20 @@ def test_authenticated_non_staff_cannot_write(api_client, customer):
     }, format='multipart')
 
     assert resp.status_code == 403
+
+
+@pytest.mark.django_db
+def test_oversized_image_rejected(api_client, staff_user):
+    category = Category.objects.create(name='Con imagen grande')
+    api_client.force_authenticate(user=staff_user)
+
+    resp = api_client.post('/api/catalog/products/', {
+        'title': 'Producto', 'price': '10.00', 'category': category.id,
+        'stock': 1, 'image': make_oversized_image(),
+    }, format='multipart')
+
+    assert resp.status_code == 400
+    assert 'image' in resp.data
 
 
 @pytest.mark.django_db

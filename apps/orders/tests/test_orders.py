@@ -180,6 +180,121 @@ def test_only_staff_can_mark_as_paid(api_client, customer, staff_user, address, 
 
 
 @pytest.mark.django_db
+def test_checkout_via_api_creates_order_and_decrements_stock(api_client, customer, address, product):
+    api_client.force_authenticate(user=customer)
+
+    resp = api_client.post('/api/orders/', {
+        'address_id': address.id,
+        'items': [{'product_id': product.id, 'quantity': 2}],
+    }, format='json')
+
+    assert resp.status_code == 201
+    assert resp.data['status'] == 'pending'
+    assert resp.data['total'] == '200.00'
+    product.refresh_from_db()
+    assert product.stock == 3
+
+
+@pytest.mark.django_db
+def test_checkout_via_api_rejects_empty_items(api_client, customer, address):
+    api_client.force_authenticate(user=customer)
+
+    resp = api_client.post('/api/orders/', {'address_id': address.id, 'items': []}, format='json')
+
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+def test_checkout_via_api_with_bad_address_returns_400(api_client, customer, product):
+    api_client.force_authenticate(user=customer)
+
+    resp = api_client.post('/api/orders/', {
+        'address_id': 999999,
+        'items': [{'product_id': product.id, 'quantity': 1}],
+    }, format='json')
+
+    assert resp.status_code == 400
+    assert Order.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_checkout_via_api_with_insufficient_stock_returns_400(api_client, customer, address, product):
+    api_client.force_authenticate(user=customer)
+
+    resp = api_client.post('/api/orders/', {
+        'address_id': address.id,
+        'items': [{'product_id': product.id, 'quantity': 999}],
+    }, format='json')
+
+    assert resp.status_code == 400
+    assert Order.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_owner_can_list_retrieve_and_cancel_own_order_via_api(api_client, customer, address, product):
+    order = OrderService.create_order(
+        user=customer, address_id=address.id,
+        items=[{'product_id': product.id, 'quantity': 1}],
+    )
+    api_client.force_authenticate(user=customer)
+
+    resp = api_client.get('/api/orders/')
+    assert resp.status_code == 200
+    assert resp.data['count'] == 1
+
+    resp = api_client.get(f'/api/orders/{order.id}/')
+    assert resp.status_code == 200
+
+    resp = api_client.post(f'/api/orders/{order.id}/cancel/')
+    assert resp.status_code == 200
+    assert resp.data['status'] == 'cancelled'
+    product.refresh_from_db()
+    assert product.stock == 5
+
+
+@pytest.mark.django_db
+def test_cancel_already_cancelled_order_via_api_returns_400(api_client, customer, address, product):
+    order = OrderService.create_order(
+        user=customer, address_id=address.id,
+        items=[{'product_id': product.id, 'quantity': 1}],
+    )
+    api_client.force_authenticate(user=customer)
+    api_client.post(f'/api/orders/{order.id}/cancel/')
+
+    resp = api_client.post(f'/api/orders/{order.id}/cancel/')
+
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+def test_mark_as_paid_on_already_paid_order_via_api_returns_400(api_client, customer, staff_user, address, product):
+    order = OrderService.create_order(
+        user=customer, address_id=address.id,
+        items=[{'product_id': product.id, 'quantity': 1}],
+    )
+    api_client.force_authenticate(user=staff_user)
+    api_client.patch(f'/api/orders/{order.id}/mark-as-paid/')
+
+    resp = api_client.patch(f'/api/orders/{order.id}/mark-as-paid/')
+
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+def test_staff_sees_all_orders_via_api(api_client, customer, staff_user, address, product):
+    OrderService.create_order(
+        user=customer, address_id=address.id,
+        items=[{'product_id': product.id, 'quantity': 1}],
+    )
+
+    api_client.force_authenticate(user=staff_user)
+    resp = api_client.get('/api/orders/')
+
+    assert resp.status_code == 200
+    assert resp.data['count'] == 1
+
+
+@pytest.mark.django_db
 def test_last_unit_race_only_one_buyer_wins(customer, other_customer, address, product):
     """Prueba la garantía real de select_for_update() + UPDATE condicional: solo un
     comprador se lleva la última unidad, sin importar el orden de llegada.
