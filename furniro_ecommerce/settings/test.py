@@ -4,7 +4,7 @@ from .base import *  # noqa: F401,F403
 from .base import BASE_DIR
 
 DEBUG = False
-SECRET_KEY = 'django-insecure-test-key-not-for-real-use-32bytes'
+SECRET_KEY = 'django-insecure-test-key-not-for-real-use-32bytes'  # nosec B105 -- solo test.py, prod exige env var
 ALLOWED_HOSTS = ['*']
 
 # Nunca pegarle a Cloudinary real desde un test: filesystem local en un dir temporal.
