@@ -16,6 +16,14 @@ def make_test_image():
     return SimpleUploadedFile('test.png', buf.read(), content_type='image/png')
 
 
+def make_oversized_image():
+    # BMP sin compresión: 1500x1500x3 bytes ~6.4MB, supera el límite de 5MB real.
+    buf = io.BytesIO()
+    Image.new('RGB', (1500, 1500), color='green').save(buf, format='BMP')
+    buf.seek(0)
+    return SimpleUploadedFile('big.bmp', buf.read(), content_type='image/bmp')
+
+
 @pytest.fixture
 def api_client():
     return APIClient()
@@ -49,6 +57,18 @@ def test_public_can_list_posts_without_auth(api_client, staff_user, category):
 
     assert resp.status_code == 200
     assert resp.data['count'] == 1
+
+
+@pytest.mark.django_db
+def test_oversized_image_rejected(api_client, staff_user, category):
+    api_client.force_authenticate(user=staff_user)
+
+    resp = api_client.post('/api/blog/posts/', {
+        'title': 'Post con imagen grande', 'category': category.id, 'image': make_oversized_image(),
+    }, format='multipart')
+
+    assert resp.status_code == 400
+    assert 'image' in resp.data
 
 
 @pytest.mark.django_db
