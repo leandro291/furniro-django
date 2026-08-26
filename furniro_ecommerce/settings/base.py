@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'cloudinary',
     # Apps propias
     'apps.accounts',
+    'apps.catalog',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -82,6 +83,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+MEDIA_URL = 'media/'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ---- DRF ----
@@ -130,6 +133,13 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env.str('CLOUDINARY_CLOUD_NAME', default=''),
     'API_KEY': env.str('CLOUDINARY_API_KEY', default=''),
     'API_SECRET': env.str('CLOUDINARY_API_SECRET', default=''),
+}
+
+# Todas las imágenes (Product.image, Post.image) se suben a Cloudinary.
+# Funciona igual en dev y prod (servicio remoto); test.py lo pisa para no pegarle a la red.
+STORAGES = {
+    'default': {'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage'},
+    'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
 }
 
 # ---- CORS ----
