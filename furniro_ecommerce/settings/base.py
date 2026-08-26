@@ -33,6 +33,8 @@ INSTALLED_APPS = [
     # Apps propias
     'apps.accounts',
     'apps.catalog',
+    'apps.orders',
+    'apps.blog',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
