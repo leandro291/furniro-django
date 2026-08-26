@@ -2,7 +2,7 @@ from .base import *  # noqa: F401,F403
 from .base import BASE_DIR
 
 DEBUG = False
-SECRET_KEY = 'django-insecure-test-key'
+SECRET_KEY = 'django-insecure-test-key-not-for-real-use-32bytes'
 ALLOWED_HOSTS = ['*']
 
 DATABASES = {
