@@ -1,6 +1,19 @@
-# Furniro E-commerce Backend
+<h1 align="center">Furniro · API</h1>
+<p align="center">API REST de e-commerce de muebles — catálogo, pedidos con snapshot y control de stock atómico</p>
 
-API REST para el backend de un e-commerce de muebles, construida con Django y Django REST Framework. Maneja identidad de usuarios, catálogo de productos, ciclo de vida de pedidos con control de stock concurrente, y contenido editorial (blog).
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
+  <img src="https://img.shields.io/badge/DRF-A30000?style=for-the-badge&logo=django&logoColor=white" alt="DRF">
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT">
+  <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white" alt="Cloudinary">
+</p>
+
+<p align="center">
+  <a href="https://furniro-react-ecommerce.vercel.app"><img src="https://img.shields.io/badge/Ver_demo-2F81F7?style=for-the-badge&logo=vercel&logoColor=white" alt="Ver demo"></a>
+  <a href="https://github.com/leandro291/furniro-react-ecommerce"><img src="https://img.shields.io/badge/Frontend-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="Frontend"></a>
+</p>
 
 ## Stack
 
