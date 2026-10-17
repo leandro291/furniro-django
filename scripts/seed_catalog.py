@@ -77,6 +77,8 @@ def main():
     for name, (models, (low, high), color) in CATALOG.items():
         if name not in categories:
             res = session.post(f'{base}/api/catalog/categories/', json={'name': name}, timeout=TIMEOUT)
+            if res.status_code == 403:
+                sys.exit(f'{args.email} no es staff: crear categorías y productos requiere is_staff=true.')
             res.raise_for_status()
             categories[name] = res.json()['id']
 
