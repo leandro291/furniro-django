@@ -3,4 +3,5 @@ venv
 skills-lock.json
 __pycache__
 .claude
-CLAUDE.mddb.sqlite3
+CLAUDE.md
+db.sqlite3
