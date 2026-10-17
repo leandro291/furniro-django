@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://furniro-react-ecommerce.vercel.app"><img src="https://img.shields.io/badge/Ver_demo-2F81F7?style=for-the-badge&logo=vercel&logoColor=white" alt="Ver demo"></a>
-  <a href="https://github.com/leandro291/furniro-react-ecommerce"><img src="https://img.shields.io/badge/Frontend-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="Frontend"></a>
+  <a href="https://github.com/leandro291/furniro-react"><img src="https://img.shields.io/badge/Frontend-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="Frontend"></a>
 </p>
 
 ## Stack
@@ -50,7 +50,7 @@ El único servicio hoy es `apps/orders/services.py::OrderService`, punto único 
 
 ```bash
 git clone <url-del-repo>
-cd furniro-ecommerce-backend
+cd furniro-django
 python -m venv venv
 source venv/bin/activate
 
